@@ -102,6 +102,7 @@ Shutdown - запланированное выключение
 Service service_name start | stop | reload | restart
 
 Инициализация в режиме SYSTEMD.
+
 Unit - модули, модули которыми оперирует systemd:
 .service - службы
 .mount - точки монтирования
@@ -112,6 +113,35 @@ Unit - модули, модули которыми оперирует systemd:
 /etc/systemd - директория с управляемыми юнитами
 /usr/lib/systemd/system - по этому пути расположены файлы .service, .mount, .device, .socet, .path и т.д.
 /etc/systemd - файлы расположенные в этой директории пришли на замену файлу по пути /etc/inittab, теперь файле inittab содержится сообщение что он ни за что не овечает и теперь все настройки храняться в /etc/systemd.
+systemctl list-units - выводит список активных юнитов
+systemctl --failed - юниты которые не запустились
+systemctl list-units --type=(после равно нужно указать тип юнитов)
+Runlevel          Target              Описание
+0                 poweroff.target     Выключение
+1                 rescue.target       Однопользовательский
+2,4               multi-user.target   Настраиваемые режимы
+3                 multi-user.target   Многопользовательский
+5                 graphical.target    Графика
+6                 reboot.target       Перезагрузка
+systemctl list-units -type=target     -узнать запущенные таргеты
+systemctl isolate name.target         -переключится на другой
+systemctl set-default -f name.target  -установить по умолчанию
+journald - сдужба журналирования
+systemctl reboot | poweroff | suspend | hibernate | hybrid-sleep
+systemctl start | stop | reload | restart | status "unit"
+Дописать плюсы systemd
+
+Инициализация в режиме UPSTART.
+
+services и tasks - то, чем оперирует upstart
+/etc/init - каталог файлов-заданий (jobs)
+initctl - утилита управления upstart
+service в отличие task перезапускается в случае аварийного завершения, task не перезапускается
+ufw - firewall UPSTART
+/etc/init/rc-sysinit.conf - файл конфигурации для изменения runlevel
+UPSTART обратно совместим с SysV
+
+
 
 
 
