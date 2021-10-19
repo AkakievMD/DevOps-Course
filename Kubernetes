@@ -1,3 +1,54 @@
+                                                                        Core Concepts
+
+1) Архитектура kubernetes
+
+Node
+1. Master
+Service:
+ETCD - Высокодоступное хранилище типа ключ-значение, представляет собой NoSQL базу данных
+Scheduler - Планировщик определяющий правильную Node для развертывания приложения, для определения рабочего узла Scheduler берет во внимание требования приложения ресурсам узла, емкость рабочих Node и т.д.
+Controller Manager - Node-Controller, replication-controller (Более новый вариант Replica set) и т.д.
+API Server - набор публичных свойств и методов для взаимодействия с другими приложениями.
+Container runtime - Среда исполнения контейнеров (Docker. Conteinerd. CRI-O)
+Kublet - Агент kubernetes
+Kube Proxy - Обеспечивает связь между всеми узлами кластера
+CNI - Сетевой плагин (Flunnel, Calico и т.д.)
+
+2. Worker
+Kublet - Агент kubernetes
+Container runtime - Среда исполнения контейнеров (Docker. Conteinerd. CRI-O)
+Kube Proxy - Обеспечивает связь между всеми узлами кластера
+CNI - Сетевой плагин (Flunnel, Calico и т.д.)
+
+2) Конфигурирование ETCD
+
+3) Устройство взаимодействия компонентов кластера через API Server
+
+4) Controller Manager 
+Namespace Controller
+ServiceAccount Controller
+PV-Binder Controller
+Replication Controller
+PV-Protection Controller
+Endpoint Controller
+Deployment Controller
+Node Controller
+Statefulset Controller
+Job Controller
+CronJob Controller
+Replicaset Controller
+
+5) Scheduler
+
+6) Агент kubernetes Kubelet
+
+7) Kube Proxy
+
+
+
+
+                                                                         Общая информация
+
 1. Правило масштабирования в кластере kubernetes:
 Один Pod - один контейнер 
 Для создания еще одного или нескольких контейнеров в Pod, необходимо убедиться что контейнеры не одного типа
@@ -25,8 +76,11 @@ Deployment set автоматически создает Replica set
 Сетевой адрес Pod
 Все Pod должны уметь связываться между собой без использования NAT
 Все Node должны уметь связываться c любыми контейнерами без использования NAT
+
 При выборе плагина стоит обратить на следующие особенности плагина:
 Конфигурирование (простота установки)
 Безопасность (Шифрование и NetworkPolices)
 Производительность (Скорость обработки данных)
 Потребления ресурсов (Сколько требуется выделить RAM, CPU и т.д.)
+
+
