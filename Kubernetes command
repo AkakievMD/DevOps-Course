@@ -1,0 +1,2 @@
+ kubectl get -A IngressClass | grep nginx (Поиск Ingress класса)
+ kubectl delete IngressClass nginx (Удаление Ingress класса)
