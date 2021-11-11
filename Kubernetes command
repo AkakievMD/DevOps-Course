@@ -1,2 +1,5 @@
- kubectl get -A IngressClass | grep nginx (Поиск Ingress класса)
- kubectl delete IngressClass nginx (Удаление Ingress класса)
+kubectl get -A IngressClass | grep nginx (Поиск Ingress класса)
+kubectl delete IngressClass nginx (Удаление Ingress класса)
+kubectl patch service nginx-ingress-controller-1636659940 \                 # 
+-n nginx-ingress \                                                          # Команда для назначения внешнего ip (EXTERNAL-IP) адреса для ЛЮБОГО сервиса
+-p '{"spec": {"type": "LoadBalancer", "externalIPs":["192.168.250.130"]}}'  #
