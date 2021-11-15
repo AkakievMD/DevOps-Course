@@ -3,3 +3,4 @@ kubectl delete IngressClass nginx (Удаление Ingress класса)
 kubectl patch service nginx-ingress-controller-1636659940 \                 # 
 -n nginx-ingress \                                                          # Команда для назначения внешнего ip (EXTERNAL-IP) адреса для ЛЮБОГО сервиса
 -p '{"spec": {"type": "LoadBalancer", "externalIPs":["192.168.250.130"]}}'  # -n (namespace) , -p (patch)
+kubectl delete all --all -n {namespace} (Удаляет все в ns без удаления ns)  # all относится ко всем типам ресурсов, таким как модули, развертывания, службы и т. Д. --all используется для удаления каждого объекта этого типа ресурса вместо указания его с использованием его имени или метки.
