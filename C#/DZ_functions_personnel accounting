@@ -1,0 +1,103 @@
+using System;
+
+namespace DZ_functions_personnel accounting
+{
+    class Program
+    {
+        public static void Main(string[] args)
+        {
+            int var;
+            string userInput;
+
+            string[] fullName = new string[0];
+            string[] position = new string[0];
+
+            do
+            {
+                Console.WriteLine("Выберите опцию меню.\n1) Добавить досье\n2) вывести все досье");
+                Console.Write("Введите ваш вариант: ");
+                var = Convert.ToInt32(Console.ReadLine());
+               
+                switch (var)
+                {
+                    case 1:
+                        {
+                            Console.Write("\nВведите ФИО сотрудника: ");
+                            userInput = Console.ReadLine();
+
+                            fullName = AddFullNameDossier(fullName, userInput);
+
+                            Console.Write("Введите должность сотрудника: ");
+                            userInput = Console.ReadLine();
+
+                            position = AddPositionDossier(position, userInput);
+                            Console.WriteLine();
+                        }
+                        break;
+
+                    case 2:
+                        {
+                            OutputAllDossiers(fullName, position);
+                            Console.WriteLine("\n");
+                        }
+                        break;
+                }
+            } while (true);
+            
+        }
+
+        static string[] AddFullNameDossier(string[] fullName, string userInput)
+        {
+            string variableFullName = userInput;
+
+            string [] tempFullName = new string[fullName.Length + 1];
+
+            for (int i = 0; i < fullName.Length; i++)
+            {
+                tempFullName[i] = fullName[i];
+            }
+            tempFullName[tempFullName.Length - 1] = variableFullName;
+
+            fullName = tempFullName;
+
+            return fullName;
+        }
+
+        static string[] AddPositionDossier(string[] position, string userInput)
+        {
+            string variablePosition = userInput;
+
+            string[] tempPosition = new string[position.Length + 1];
+
+            for (int i = 0; i < position.Length; i++)
+            {
+                tempPosition[i] = position[i];
+            }
+            tempPosition[tempPosition.Length - 1] = variablePosition;
+
+            position = tempPosition;
+
+            return position;
+        }
+
+        static void OutputAllDossiers(string[] fullName, string[] position)
+        {
+            int i;
+            int j;
+            int indexNumber = 1;
+            int indexPosition = 0;
+
+            for (i = 0; i < fullName.Length; i++)
+            {
+                Console.Write($"{indexNumber}){fullName[i]} - ");
+                indexNumber++;
+
+                for (j = indexPosition; j < position.Length; j = position.Length)
+                {
+                    Console.Write($"{position[j]} ");
+                    indexPosition++;
+                }
+            }      
+        }
+    }
+}
