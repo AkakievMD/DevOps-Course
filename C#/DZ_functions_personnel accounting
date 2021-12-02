@@ -1,6 +1,6 @@
 using System;
 
-namespace DZ_functions_personnel accounting
+namespace DZ_functions_PersonnelAccounting
 {
     class Program
     {
@@ -37,8 +37,26 @@ namespace DZ_functions_personnel accounting
 
                     case 2:
                         {
+                            if ()
+                            {
+                                OutputDeletedDossiers(fullName, position);
+                                Console.WriteLine("\n");
+                            }
+
                             OutputAllDossiers(fullName, position);
                             Console.WriteLine("\n");
+                        }
+                        break;
+
+                    case 3:
+                        {
+                            Console.WriteLine("Какое резюме вы хотите удалить?");
+                            OutputAllDossiers(fullName, position);
+
+                            Console.Write("\nВведите порядковый номер резюме: ");
+                            int indexNumber = Convert.ToInt32(Console.ReadLine());
+
+                            DeleteDossier(ref fullName, ref position, indexNumber);
                         }
                         break;
                 }
@@ -98,6 +116,72 @@ namespace DZ_functions_personnel accounting
                     indexPosition++;
                 }
             }      
+        }
+
+        static void OutputDeletedDossiers(string[] fullName, string[] position)
+        {
+            int i;
+            int j;
+            int indexNumber = 1;
+            int indexPosition = 0;
+
+            for (i = 0; i < fullName.Length; i++)
+            {
+                Console.Write($"{fullName[i]}");
+                indexNumber++;
+
+                for (j = indexPosition; j < position.Length; j = position.Length)
+                {
+                    Console.Write($"{position[j]}");
+                    indexPosition++;
+                }
+            }
+        }
+
+        static void DeleteDossier(ref string[] fullName, ref string[] position, int indexNumber)
+        {
+            
+
+            string[] tempFullName = new string[fullName.Length - 1];
+
+            for (int i = 0; i < indexNumber; i++)
+            {
+                if (fullName.Length == 1)
+                {
+                    fullName[0] = "Все досье удалены!";
+                }
+
+                else if(indexNumber == 1)
+                {
+                    tempFullName[i] = fullName[i + 1];
+                }
+            }
+
+            for (int i = indexNumber + 1; i < fullName.Length; i++)
+                tempFullName[i - 1] = fullName[i];
+
+            fullName = tempFullName;
+
+            
+            string[] tempPosition = new string[position.Length - 1];
+
+            for (int i = 0; i < indexNumber; i++)
+            {
+                if (position.Length == 1)
+                {
+                    position[0] = "";
+                }
+
+                else if (indexNumber == 1)
+                {
+                    tempPosition[i] = position[i + 1];
+                }
+            }
+                
+            for (int i = indexNumber + 1; i < position.Length; i++)
+                tempPosition[i - 1] = position[i];
+
+            position = tempPosition;
         }
     }
 }
