@@ -1,187 +1,168 @@
 using System;
-
+ 
 namespace DZ_functions_PersonnelAccounting
 {
     class Program
     {
         public static void Main(string[] args)
         {
-            int var;
-            string userInput;
-
-            string[] fullName = new string[0];
-            string[] position = new string[0];
-
+            bool programWorks = true;
+ 
+            string[] fullNames = new string[0];
+            string[] positions = new string[0];
+ 
             do
             {
-                Console.WriteLine("Выберите опцию меню.\n1) Добавить досье\n2) вывести все досье");
+                string indexOptions;
+ 
+                Console.WriteLine("Выберите опцию меню.\n1) Добавить досье\n2) Вывести все досье\n3) Удалить досье\n4) Поиск досье\n5) Выход");
                 Console.Write("Введите ваш вариант: ");
-                var = Convert.ToInt32(Console.ReadLine());
-               
-                switch (var)
+                indexOptions = Console.ReadLine();
+ 
+                switch (indexOptions)
                 {
-                    case 1:
-                        {
-                            Console.Write("\nВведите ФИО сотрудника: ");
-                            userInput = Console.ReadLine();
-
-                            fullName = AddFullNameDossier(fullName, userInput);
-
-                            Console.Write("Введите должность сотрудника: ");
-                            userInput = Console.ReadLine();
-
-                            position = AddPositionDossier(position, userInput);
-                            Console.WriteLine();
-                        }
+                    case "1":
+                            CreateDossier(ref fullNames, ref positions);
                         break;
-
-                    case 2:
-                        {
-                            if ()
-                            {
-                                OutputDeletedDossiers(fullName, position);
-                                Console.WriteLine("\n");
-                            }
-
-                            OutputAllDossiers(fullName, position);
-                            Console.WriteLine("\n");
-                        }
+ 
+                    case "2":
+                            OutputAllDossiers(fullNames, positions);
                         break;
-
-                    case 3:
-                        {
-                            Console.WriteLine("Какое резюме вы хотите удалить?");
-                            OutputAllDossiers(fullName, position);
-
-                            Console.Write("\nВведите порядковый номер резюме: ");
-                            int indexNumber = Convert.ToInt32(Console.ReadLine());
-
-                            DeleteDossier(ref fullName, ref position, indexNumber);
-                        }
+ 
+                    case "3":
+                            DeleteDossier(ref fullNames, ref positions);
+                        break;
+ 
+                    case "4":
+                            SearhcDossier(fullNames, positions);
+                        break;
+ 
+                    case "5":
+                        programWorks = false;
+                        break;
+                    default:
+                            Console.WriteLine("\nОшибка ввода! Повторите ввод.\n");
                         break;
                 }
-            } while (true);
-            
+            } while (programWorks == true);
         }
-
-        static string[] AddFullNameDossier(string[] fullName, string userInput)
+ 
+        static void CreateDossier(ref string[] fullNames, ref string[] positions)
         {
-            string variableFullName = userInput;
-
-            string [] tempFullName = new string[fullName.Length + 1];
-
-            for (int i = 0; i < fullName.Length; i++)
-            {
-                tempFullName[i] = fullName[i];
-            }
-            tempFullName[tempFullName.Length - 1] = variableFullName;
-
-            fullName = tempFullName;
-
-            return fullName;
+            string userInputFullName = "";
+            string userInputPosition = "";
+ 
+            Console.Write("\nВведите ФИО сотрудника: ");
+            userInputFullName = Console.ReadLine();
+ 
+            Console.Write("Введите должность сотрудника: ");
+            userInputPosition = Console.ReadLine();
+            Console.WriteLine();
+ 
+            fullNames = AddElement(fullNames, userInputFullName);
+            positions = AddElement(positions, userInputPosition);
         }
-
-        static string[] AddPositionDossier(string[] position, string userInput)
+ 
+        static string[] AddElement(string[] array, string userInput)
         {
-            string variablePosition = userInput;
-
-            string[] tempPosition = new string[position.Length + 1];
-
-            for (int i = 0; i < position.Length; i++)
-            {
-                tempPosition[i] = position[i];
-            }
-            tempPosition[tempPosition.Length - 1] = variablePosition;
-
-            position = tempPosition;
-
-            return position;
+            string tempUserInput = userInput;
+ 
+            string[] tempArray = new string[array.Length + 1];
+ 
+            for (int i = 0; i < array.Length; i++)
+                tempArray[i] = array[i];
+ 
+            tempArray[tempArray.Length - 1] = tempUserInput;
+ 
+            array = tempArray;
+ 
+            return array;
         }
-
-        static void OutputAllDossiers(string[] fullName, string[] position)
+ 
+        static void OutputAllDossiers(string[] fullNames, string[] positions)
         {
-            int i;
-            int j;
-            int indexNumber = 1;
-            int indexPosition = 0;
-
-            for (i = 0; i < fullName.Length; i++)
+            if (fullNames.Length > 0)
             {
-                Console.Write($"{indexNumber}){fullName[i]} - ");
-                indexNumber++;
-
-                for (j = indexPosition; j < position.Length; j = position.Length)
+                int indexNumber = 1;
+ 
+                Console.WriteLine();
+ 
+                for (int i = 0; i < fullNames.Length; i++)
                 {
-                    Console.Write($"{position[j]} ");
-                    indexPosition++;
+                    Console.Write($"{indexNumber++}){fullNames[i]} - {positions[i]} ");
                 }
-            }      
-        }
-
-        static void OutputDeletedDossiers(string[] fullName, string[] position)
-        {
-            int i;
-            int j;
-            int indexNumber = 1;
-            int indexPosition = 0;
-
-            for (i = 0; i < fullName.Length; i++)
+ 
+                Console.WriteLine("\n");
+            }
+ 
+            else
             {
-                Console.Write($"{fullName[i]}");
-                indexNumber++;
-
-                for (j = indexPosition; j < position.Length; j = position.Length)
-                {
-                    Console.Write($"{position[j]}");
-                    indexPosition++;
-                }
+                Console.WriteLine("\nСписок досье пуст!\n");
             }
         }
-
-        static void DeleteDossier(ref string[] fullName, ref string[] position, int indexNumber)
+        static void DeleteDossier(ref string[] fullNames, ref string[] positions)
         {
-            
-
-            string[] tempFullName = new string[fullName.Length - 1];
-
-            for (int i = 0; i < indexNumber; i++)
+            if (fullNames.Length > 0)
             {
-                if (fullName.Length == 1)
+                Console.WriteLine("\nКакое резюме вы хотите удалить?");
+                OutputAllDossiers(fullNames, positions);
+ 
+                Console.Write("Введите порядковый номер резюме: ");
+                int indexNumber = Convert.ToInt32(Console.ReadLine());
+ 
+                fullNames = DeleteElement(fullNames, indexNumber);
+                positions = DeleteElement(positions, indexNumber);
+            }
+ 
+            else
+            {
+                Console.WriteLine("\nСписок досье пуст!");
+            }
+ 
+            Console.WriteLine();
+        }
+        static string[] DeleteElement(string[] array, int indexNumber)
+        {
+            if (indexNumber > 0 && indexNumber <= array.Length)
+            {
+                string[] tempArray = new string[array.Length - 1];
+ 
+                --indexNumber;
+ 
+                for (int i = 0; i < indexNumber; i++)
+                    tempArray[i] = array[i];
+ 
+                for (int i = indexNumber + 1; i < array.Length; i++)
+                    tempArray[i - 1] = array[i];
+ 
+                array = tempArray;
+            }
+ 
+            return array;
+        }
+ 
+        static void SearhcDossier(string[] fullNames, string[] positions)
+        {
+            if (fullNames.Length > 0)
+            {
+                Console.Write("\nВведите ФИО: ");
+                string fullNameLine = Console.ReadLine();
+ 
+                Console.WriteLine("\nРезультаты поиска:");
+ 
+                for (int i = 0; i < fullNames.Length; i++)
                 {
-                    fullName[0] = "Все досье удалены!";
-                }
-
-                else if(indexNumber == 1)
-                {
-                    tempFullName[i] = fullName[i + 1];
+                    if (fullNames[i] == fullNameLine)
+                    {
+                        Console.WriteLine($"ФИО: {fullNames[i]}\nДолжность: {positions[i]}\n");
+                    }
                 }
             }
-
-            for (int i = indexNumber + 1; i < fullName.Length; i++)
-                tempFullName[i - 1] = fullName[i];
-
-            fullName = tempFullName;
-
-            
-            string[] tempPosition = new string[position.Length - 1];
-
-            for (int i = 0; i < indexNumber; i++)
+ 
+            else
             {
-                if (position.Length == 1)
-                {
-                    position[0] = "";
-                }
-
-                else if (indexNumber == 1)
-                {
-                    tempPosition[i] = position[i + 1];
-                }
+                Console.WriteLine("\nСписок досье пуст!\n");
             }
-                
-            for (int i = indexNumber + 1; i < position.Length; i++)
-                tempPosition[i - 1] = position[i];
-
-            position = tempPosition;
         }
     }
 }
