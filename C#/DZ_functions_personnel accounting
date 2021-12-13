@@ -59,11 +59,11 @@ namespace DZ_functions_PersonnelAccounting
             userInputPosition = Console.ReadLine();
             Console.WriteLine();
  
-            fullNames = AddElement(fullNames, userInputFullName);
-            positions = AddElement(positions, userInputPosition);
+            fullNames = PopulatesArray(fullNames, userInputFullName);
+            positions = PopulatesArray(positions, userInputPosition);
         }
  
-        static string[] AddElement(string[] array, string userInput)
+        static string[] PopulatesgArray(string[] array, string userInput)
         {
             string tempUserInput = userInput;
  
@@ -110,8 +110,8 @@ namespace DZ_functions_PersonnelAccounting
                 Console.Write("Введите порядковый номер резюме: ");
                 int indexNumber = Convert.ToInt32(Console.ReadLine());
  
-                fullNames = DeleteElement(fullNames, indexNumber);
-                positions = DeleteElement(positions, indexNumber);
+                fullNames = ShrinksArray(fullNames, indexNumber);
+                positions = ShrinksArray(positions, indexNumber);
             }
  
             else
@@ -121,7 +121,7 @@ namespace DZ_functions_PersonnelAccounting
  
             Console.WriteLine();
         }
-        static string[] DeleteElement(string[] array, int indexNumber)
+        static string[] ShrinksArray(string[] array, int indexNumber)
         {
             if (indexNumber > 0 && indexNumber <= array.Length)
             {
