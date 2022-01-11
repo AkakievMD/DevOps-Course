@@ -63,7 +63,7 @@ namespace DZ_functions_PersonnelAccounting
             positions = PopulatesArray(positions, userInputPosition);
         }
  
-        static string[] PopulatesgArray(string[] array, string userInput)
+        static string[] PopulatesArray(string[] array, string userInput)
         {
             string tempUserInput = userInput;
  
