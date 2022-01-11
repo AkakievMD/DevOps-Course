@@ -16,9 +16,6 @@ namespace DZ_variables
             uint distanceToMoon = 384403;
             float myGrowth = 1.80f;
             sbyte temperatureInNorilskInWinter = -60;
- 
- 
- 
         }
     }
 }
