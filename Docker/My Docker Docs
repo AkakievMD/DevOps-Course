@@ -1,0 +1,37 @@
+Инструкции Docker
+
+FROM — задаёт базовый (родительский) образ.
+LABEL — описывает метаданные. Например — сведения о том, кто создал и поддерживает образ.
+ENV — устанавливает постоянные переменные среды.
+RUN — выполняет команду и создаёт слой образа. Используется для установки в контейнер пакетов.
+COPY — копирует в контейнер файлы и папки.
+ADD — копирует файлы и папки в контейнер, может распаковывать локальные .tar-файлы.
+CMD — описывает команду с аргументами, которую нужно выполнить когда контейнер будет запущен. Аргументы могут быть переопределены при запуске контейнера. В файле может присутствовать лишь одна инструкция CMD.
+WORKDIR — задаёт рабочую директорию для следующей инструкции.
+ARG — задаёт переменные для передачи Docker во время сборки образа.
+ENTRYPOINT — предоставляет команду с аргументами для вызова во время выполнения контейнера. Аргументы не переопределяются.
+EXPOSE — указывает на необходимость открыть порт.
+VOLUME — создаёт точку монтирования для работы с постоянным хранилищем.
+
+Пример сборки образа для ASP.NET C# приложения:
+
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim AS base
+WORKDIR /app
+EXPOSE 80
+EXPOSE 443
+ 
+FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
+WORKDIR /src
+COPY ["project_name.csproj", ""]
+RUN dotnet restore "./project_name.csproj"
+COPY . .
+WORKDIR "/src/."
+RUN dotnet build "project_name.csproj" -c Release -o /app/build
+ 
+FROM build AS publish
+RUN dotnet publish "project_name.csproj" -c Release -o /app/publish
+ 
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "project_name.dll"]
