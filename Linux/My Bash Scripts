@@ -1,0 +1,5 @@
+#!/bin/bash
+for numberTelephone in 9180000000 9520000000 9640000000 9280000000
+do
+ curl "https://cl-mg.ru/sms/zabbix/monitoring.php?phone=$numberTelephone&text=Авария!%20Статус%20батареи%20ИБП:%20батарея%20разряжается.%20Где:%20OXY%204%20этаж%20эмбриология"
+done
