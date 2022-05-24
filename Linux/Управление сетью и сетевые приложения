@@ -138,7 +138,7 @@ max-lease-time 14400;
 ----------------------------------------------------------------------------------------------------DNS BIND 9 on CenOS 7--------------------------------------------------------------------------------------------------------------
 yum install bind bind-utils 
 firewall-cmd --add-port=53/udp --permanent && firewall-cmd --reload
-/etc/named.conf (основной конфигурационный файл, добавить секцию forwarders и в конце добавить запись include "/etc/named/named.conf.local";)
+/etc/named.conf (основной конфигурационный файл, добавить секцию forwarders и в конце добавить запись include "/etc/named/named.conf.local";) (актуально если пути к зонам прописать в отдельном файле)
 mkdir /etc/named/zones/ && touch /etc/named/named.conf.local && touch /etc/named/zones/{kuber.local,192.168.80} (пример файла с описанием зон и файлами прямой и обратной зоны)
 добавить и изменить параметры в /etc/sysconfig/network-scripts/ifcfg-файла подключения BOOTPROTO=static IPADDR=ip-for-host DNS1=ip-of-host-with-dns PREFIX=24 DOMAIN=имя прямой зоны ZONE=public GATEWAY=ip роутера или любого шлюза
 systemctl enable named, systemctl start named, systemctl restart NetworkManager
@@ -178,17 +178,67 @@ $TTL    604800
 ; VM - PTR records
 137    IN    PTR    elastic.myzone.local.
 
-------------------------------------------Описание зон named.conf.local----------------------------------------------
-zone "myzone.local" {
-    type master;
-    file "/etc/named/zones/myzone.local"; # zone file path
+---------------------------------------------------------------Config file /etc/named.conf-----------------
+options {
+        listen-on port 53 { 127.0.0.1;192.168.250.122; };
+        listen-on-v6 port 53 { ::1; };
+        directory       "/var/named";
+        dump-file	"/var/named/data/cache_dump.db";
+        statistics-file "/var/named/data/named_stats.txt";
+        memstatistics-file "/var/named/data/named_mem_stats.txt";
+        recursing-file  "/var/named/data/named.recursing";
+        secroots-file   "/var/named/data/named.secroots";
+        allow-query     { localhost;192.168.250.0/24; };
+
+        /*
+         - If you are building an AUTHORITATIVE DNS server, do NOT enable recursion.
+         - If you are building a RECURSIVE (caching) DNS server, you need to enable
+           recursion.
+         - If your recursive DNS server has a public IP address, you MUST enable access
+           control to limit queries to your legitimate users. Failing to do so will
+           cause your server to become part of large scale DNS amplification
+           attacks. Implementing BCP38 within your network would greatly
+           reduce such attack surface
+        */
+	recursion yes;
+
+ dnssec-enable yes;
+ dnssec-validation yes;
+
+ /* Path to ISC DLV key */
+ bindkeys-file "/etc/named.root.key";
+
+ managed-keys-directory "/var/named/dynamic";
+
+ pid-file "/run/named/named.pid";
+ session-keyfile "/run/named/session.key";
 };
 
-zone "80.168.192.in-addr.arpa" {
-    type master;
-    file "/etc/named/zones/192.168.80";
+logging {
+	channel default_debug {
+         file "data/named.run";
+         severity dynamic;
+        };
 };
 
+zone "." IN {
+	       type hint;
+        file "named.ca";
+};
+
+zone "kube-island.local" IN {
+        type master;
+        file "/etc/named/zones/kube-island.local";
+        allow-update { none; };
+
+zone "250.168.192.in-addr.arpa" IN {
+        type master;
+        file "/etc/named/zones/192.168.250";
+        allow-update { none; };
+};
+
+include "/etc/named.rfc1912.zones";
+include "/etc/named.root.key";
 -------------------------------------------------------------------------------------------------------------Сетевые утилиты и команды----------------------------------------------------------------------------------------------------
 nmcli connection reload(перезагрузка всей кофигурации после изменений в файлах /etc/sysconfig/network-scripts/ifcfg-имя сетевухи и прочие файлы или /etc/NetworkManager/прочие файлы)
 nmcli -p device status (посмотреть состояние интерфейсов) nmcli -p general status(Состояние NetworkManager) nmcli connection show(покажет NAME, UUID, TYPE, DEVICE это - Профиль connection)
