@@ -20,26 +20,100 @@ SHELL — SHELL Инструкция позволяет оболочку по у
 
 Пример сборки образа для ASP.NET C# приложения:
 
-FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim AS base
+------------------------------------------------------------------------------------------------------------
+
+ARG artifactory_url="artifactory.island.tech"
+ARG docker_registry="artifactory.island.tech/docker/"
+ARG docker_tag="6.0"
+  
+### Build service
+FROM ${docker_registry}dotnet/sdk:${docker_tag} as builder
+# Set arguments
+ARG project_name="factoring"
+ARG service_path="./src/"
+ARG service_name="Abdt.Factoring.Orchestrator"
+ARG service_prefix=".Web"
+ARG csproj="/${service_name}${service_prefix}.csproj"
+ARG artifactory_url="artifactory.island.tech"
+ARG artifactory_url_nuget_virtual="https://artifactory.island.tech/artifactory/api/nuget/nuget"
+ARG artifactory_url_nuget_virtual_v3="https://artifactory.island.tech/artifactory/api/nuget/v3/nuget"
+ARG artifactory_url_nuget_local="https://artifactory.island.tech/artifactory/api/nuget/${project_name}-nuget-local"
+ARG artifactory_login
+ARG artifactory_password
+ 
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
- 
-FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
-WORKDIR /src
-COPY ["project_name.csproj", ""]
-RUN dotnet restore "./project_name.csproj"
-COPY . .
-WORKDIR "/src/."
-RUN dotnet build "project_name.csproj" -c Release -o /app/build
- 
-FROM build AS publish
-RUN dotnet publish "project_name.csproj" -c Release -o /app/publish
- 
-FROM base AS final
+# Copy and restore project
+COPY ./ /app
+ARG ASPNETCORE_ENVIRONMENT=Production
+RUN dotnet nuget add  source ${artifactory_url_nuget_virtual} --name island.tech --username ${artifactory_login} --password ${artifactory_password} --store-password-in-clear-text && \
+    dotnet nuget add source ${artifactory_url_nuget_virtual_v3} --name island.tech.v3 --username ${artifactory_login} --password ${artifactory_password} --store-password-in-clear-text && \
+    sed -i 's#<add key="nuget.org" value="https://api.nuget.org/v3/index.json" protocolVersion="3" />##g' /root/.nuget/NuGet/NuGet.Config
+
+# Add Instana
+#RUN dotnet add ${service_path}${service_name}${service_prefix} package Instana.Tracing.Core --source ${artifactory_url_nuget_virtual} --version 1.214.3 && \
+#    dotnet add ${service_path}${service_name}${service_prefix} package Instana.Tracing.Core.Rewriter.Linux --source ${artifactory_url_nuget_virtual} --version 1.214.3
+
+# If Migrator exist
+RUN [ -d "${service_name}.Migrator" ] && \
+    dotnet restore ${service_path}${service_name}.Migrator  --ignore-failed-sources --force && \
+    dotnet publish ${service_path}${service_name}.Migrator -c Release -o /app/publish/ -r centos.7-x64 --no-self-contained \
+    || echo "Migrator does not exists."
+
+# Copy full project and build
+RUN [ -d "${service_path}${service_name}${service_prefix}" ] && \
+    dotnet restore ${service_path}${service_name}${service_prefix} --ignore-failed-sources --force && \
+    dotnet publish ${service_path}${service_name}${service_prefix}${csproj} -c Release -o /app/publish/ -r centos.7-x64 --no-self-contained \
+    || echo "Error: service not found" || exit 1
+
+# Build runtime/aspnet image
+FROM ${docker_registry}dotnet/aspnet:6.0-abdt as base
+# Set arguments
+
+#ARG Beta
+ARG ASPNETCORE_ENVIRONMENT
+ARG artifactory_url="artifactory.island.tech"
+ARG service_port="5000"
+# Create label
+LABEL digital.island.vendor=Ak\ Bars\ Digital\ Technologies \
+#     digital.akislandbars.is-beta=${Beta} \
+      digital.island.is-production=${ASPNETCORE_ENVIRONMENT} \
+      digital.island.version=${BUILD_VERSION} \
+      digital.island.release-date=${BUILD_DATE}
+
+
+# Prepare if need some install
+#RUN sed -i "s#http://deb.debian.org/debian#https://artifactory.island.tech/artifactory/debian-remote#g" /etc/apt/sources.list && \
+#    sed -i "s#http://security.debian.org/debian-security#https://artifactory.island.tech/artifactory/debian-security#g" /etc/apt/sources.list
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/Moscow
+ARG BUILD_DATE
+ARG BUILD_VERSION
+ARG TEAMCITY_PROJECT_NAME
+
+# Copy builded service
 WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "project_name.dll"]
+COPY --from=builder /app/publish .
+ 
+#Instana
+#ENV DOTNET_STARTUP_HOOKS=/app/Instana.Tracing.Core.dll
+#ENV CORECLR_ENABLE_PROFILING=1
+#ENV CORECLR_PROFILER={cf0d821e-299b-5307-a3d8-b283c03916dd}
+#ENV CORECLR_PROFILER_PATH=/app/instana_tracing/CoreProfiler.so
+
+# Set build information
+ENV BUILD_DATE ${BUILD_DATE}
+ENV BUILD_VERSION ${BUILD_VERSION}
+ENV TEAMCITY_PROJECT_NAME ${TEAMCITY_PROJECT_NAME}
+ENV ASPNETCORE_ENVIRONMENT ${ASPNETCORE_ENVIRONMENT}
+
+# Set ports
+ENV ASPNETCORE_URLS http://0.0.0.0:${service_port}
+EXPOSE ${service_port}
+
+
+ENTRYPOINT ["dotnet", "/app/Abdt.Factoring.Orchestrator.Web.dll"]
+
+-------------------------------------------------------------------------------------------------------------
 
 Докер команды:
 
@@ -49,7 +123,7 @@ docker rm $(docker ps --filter status=exited --all -q) (удаляет выво�
 docker pull (далее укзываем image или если это частное защищенное хранилище то к примеру artifactory.island.tech/boos.solution/NameSevice:tag) 
 docker tag artifactory.island.tech/boos.solution/NameSevice:tag <-----(здесь то как у вас локально назван image влючая репозиторий где хранится и tag) ------> artifactory.island.tech/boos.solution/NameSevice:tag (Здесь как хотите назвать через пробел)
 docker images ls (покажет список всех образов, хранящихся на машине) 
-docker push (далее укзываем image или если это частное защищенное хранилище то к примеру artifactory.akbars.ru/boos.solution/NameSevice:tag)
+docker push (далее укзываем image или если это частное защищенное хранилище то к примеру artifactory.island.ru/boos.solution/NameSevice:tag)
 docker inspect NameImage (Docker inspect отображает низкоуровневую информацию о конкретном объекте Docker) docker build . (собрать dockerfile в текущей директории)
 docker image ls -q | xargs -I {} docker image rm -f {} (удалить все имеджи)
 docker stats (посмотреть потребление контейнерами памяти, процесора хоста и посмотреть нагрузку на сеть)
