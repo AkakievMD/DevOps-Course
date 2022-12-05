@@ -1,0 +1,66 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orchestrator
+  namespace: factoring
+  labels:
+    app: orchestrator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: orchestrator
+  template:
+    metadata:
+      labels:
+        app: orchestrator
+    spec:
+      securityContext:
+        seccompProfile:
+          type: Localhost
+          localhostProfile: profiles/seccomp-profile.json
+      containers:
+      - name: orchestrator
+        image: artifactory.akbars.tech/factoring-docker-local/prod/orchestrator:1.0.2
+        env:
+        - name: ENV_App__DbConnectionString
+          value: "User ID=application;Password=application;Host=192.168.250.50;Port=5432;Database=application;Pooling=true;"
+        - name: ENV_App__CamundaUrl
+          value: "http://192.168.250.50:5200"
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 2
+          httpGet:
+            path: /health
+            port: 5000
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          failureThreshold: 2
+          httpGet:
+            path: /health
+            port: 5000
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 1
+        ports:
+        - containerPort: 5000
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 250m
+            memory: 500Mi
+          limits:
+            cpu: 500m
+            memory: 1Gi
+        securityContext:
+          allowPrivilegeEscalation: false
+      serviceAccount: default
+      serviceAccountName: default
+      restartPolicy: Always
