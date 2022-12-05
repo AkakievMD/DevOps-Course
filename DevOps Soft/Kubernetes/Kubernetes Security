@@ -1,0 +1,70 @@
+                                                                        Seccomp profile
+
+
+
+
+
+{
+    "defaultAction": "SCMP_ACT_ERRNO",
+    "architectures": [
+        "SCMP_ARCH_X86_64",
+        "SCMP_ARCH_X86",
+        "SCMP_ARCH_X32"
+    ],
+    "syscalls": [
+        {
+            "names": [
+                "read",
+                "write",
+                "close",
+                "stat",
+                "fstat",
+                "lstat",
+                "poll",
+                "lseek",
+                "mmap",
+                "mprotect",
+                "munmap",
+                "rt_sigaction",
+                "pread64",
+                "access",
+                "getpid",
+                "socket",
+                "connect",
+                "sendto",
+                "recvfrom",
+                "bind",
+                "listen",
+                "getsockname",
+                "setsockopt",
+                "getsockopt",
+                "clone",
+                "execve",
+                "exit",
+                "uname",
+                "fcntl",
+                "getcwd",
+                "readlink",
+                "sigaltstack",
+                "mknod",
+                "mlock",
+                "arch_prctl",
+                "gettid",
+                "futex",
+                "sched_setaffinity",
+                "sched_getaffinity",
+                "getdents64",
+                "epoll_wait",
+                "epoll_ctl",
+                "inotify_init",
+                "openat",
+                "accept4",
+                "epoll_create1",
+                "pipe2",
+                "prlimit64",
+                "getrandom"
+            ],
+            "action": "SCMP_ACT_ALLOW"
+        }
+    ]
+}
