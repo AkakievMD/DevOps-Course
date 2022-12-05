@@ -33,6 +33,8 @@
                 "connect",
                 "sendto",
                 "recvfrom",
+                "sendmsg",
+                "recvmsg",
                 "bind",
                 "listen",
                 "getsockname",
