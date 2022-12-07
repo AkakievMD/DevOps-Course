@@ -81,7 +81,7 @@
                 "dup3",
                 "pipe2",
                 "prlimit64",
-		            "getrandom"
+		"getrandom"
             ],
             "action": "SCMP_ACT_ALLOW"
         }
