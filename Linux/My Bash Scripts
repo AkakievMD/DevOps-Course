@@ -106,3 +106,14 @@ for ((count_3=0; count_3 < ${lengthArray3}; count_3++)); do
 done
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------
+#Скрипт, который анализирует логи Nginx и выводит на экран статистику: сколько и каких кодов ответов (HTTP 200, 301, 404 и т.д.) было на сегодняшний день.
+
+#!/bin/bash
+
+today_date=$(date)
+month=$(echo $today_date | awk '{print $2}')
+day=$(echo $today_date | awk '{print $3}')
+year=$(echo $today_date | awk '{print $6}')
+
+cat access.log | grep $day/$month/$year | awk '{print $9}' | grep -oE "\b([0-9]){1}[0-9]{2}\b" | sort | uniq -c | sort -rn
+
