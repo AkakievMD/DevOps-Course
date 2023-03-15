@@ -91,3 +91,4 @@ cat /var/log/nginx/access.log | cut -f 1 -d ' ' | sort | \    # Отображе
 uniq -c | sort -hr | head -n 10                               #
 lsof | grep deleted (если после удаления файла место не очистилось значить файл держит какой-то процессс, смотрим какой процесс содержит файл) Далее kill -9 [PID]
 pgrep -l pattern |grep -i pattern | xargs -n1 pkill -9 (убить все процессы по паттерну)
+lsof утилита для просмотра открытых файловых дескрипторов
