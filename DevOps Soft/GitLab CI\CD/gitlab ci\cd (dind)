@@ -1,0 +1,60 @@
+image: docker:20.10.16
+
+variables:
+  DOCKER_TLS_CERTDIR: "/certs"
+  IMAGE_NAME: " "
+
+services:
+  - docker:20.10.16-dind
+
+stages:
+  - build_and_push_poscall-nginx
+  - build_and_push_poscall-api
+  - deploy
+
+.deploy:
+  script:
+    - docker compose -f docker-compose.yml stop 
+    - docker compose -f docker-compose.yml down
+    - docker compose -f docker-compose.yml up -d
+
+.build_and_push:
+  before_script:
+    - echo $REGISTRY_PASSWORD | docker login -u $REGISTRY_LOGIN --password-stdin $REGISTRY_URL
+  script:
+    - docker build -f ./Dockerfile.$IMAGE_NAME -t harbor.b2serv.local/pos-call/$IMAGE_NAME:$CI_COMMIT_SHORT_SHA .
+    - docker push harbor.b2serv.local/pos-call/$IMAGE_NAME:$CI_COMMIT_SHORT_SHA 
+
+build_poscall-nginx:
+  stage: build_and_push_poscall-nginx
+  tags:
+    - poscall
+  variables: 
+    IMAGE_NAME: poscall_nginx
+  script:
+    - !reference [.build_and_push, before_script]
+    - !reference [.build_and_push, script]
+  rules:
+    - if: '$CI_COMMIT_REF_NAME =~ /(^master$)/'
+
+build_poscall-api:
+  stage: build_and_push_poscall-api
+  tags:
+    - poscall
+  variables: 
+    IMAGE_NAME: poscall_api
+  script:
+    - !reference [.build_and_push, before_script]
+    - !reference [.build_and_push, script]
+  rules:
+    - if: '$CI_COMMIT_REF_NAME =~ /(^master$)/'
+    
+deploy:
+  stage: deploy
+  tags:
+    - poscall
+  script:
+    - !reference [.build_and_push, before_script]
+    - !reference [.deploy, script]
+  rules:
+    - if: '$CI_COMMIT_REF_NAME =~ /(^master$)/'
