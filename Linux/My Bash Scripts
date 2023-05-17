@@ -1,5 +1,119 @@
 #!/bin/bash
+#Цикл отправляет на определенные номера телефонов сообщение
 for numberTelephone in 9180000000 9520000000 9640000000 9280000000
 do
  curl "https://cl-mg.ru/sms/zabbix/monitoring.php?phone=$numberTelephone&text=Авария!%20Статус%20батареи%20ИБП:%20батарея%20разряжается.%20Где:%20OXY%204%20этаж%20эмбриология"
 done
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#!/bin/bash
+
+i=0
+j=0
+n=0
+k=0
+h=0
+
+#Создание папки сервиса для перемешения в нее архивов логов сервиса
+
+servicesLogsName=($(ls /bgol_services_logs_stage | awk '/(log$)/' | cut -d '.' -f 1))
+dockerServicesList=($(docker service ls | grep -v NAME | awk '{print $2, $4}' | awk '{print $1}'))
+
+for service in $(docker service ls | grep -v NAME | awk '{print $2, $4}' | awk '{print $1}')
+do 
+    if [ "${dockerServicesList[i]}" = "${servicesLogsName[j]}" ]; then mkdir /bgol_services_logs_stage/"${servicesLogsName[j]}"; else j=$(($j-1)); fi
+    i=$(($i+1))
+    j=$(($j+1))
+done
+
+#Перемещение архивов логов сервисов в отдельные дериктории
+
+servicesLogsName=($(ls /bgol_services_logs_stage | awk '/(log$)/' | cut -d '.' -f 1))
+
+lengthArray1=${#servicesLogsName[@]}
+
+cd /bgol_services_logs_stage
+
+for ((count_1=0; count_1 < ${lengthArray1}; count_1++)); do
+
+    n=0
+
+    serviceGzLogName=($(ls | awk "/(^"${servicesLogsName[k]}")/ && /(gz$)/"))
+
+    k=$(($k+1))
+
+    lengthArray2=${#serviceGzLogName[@]}
+
+for ((count_2=0; count_2 < ${lengthArray2}; count_2++)); do
+
+    mv "${serviceGzLogName[n]}" "${servicesLogsName[k-1]}"
+
+    n=$(($n+1))
+
+done
+    
+done
+
+#Трансформация оригинального лог файла сервиса в однострочный лог
+
+serviceLogName=($(ls | awk '/(log$)/'))
+
+serviceName=($(ls | awk '/(log$)/' | cut -d '.' -f 1))
+
+tempServiceName=($(ls | awk '/(^mod_)/'))
+
+lengthArray3=${#servicesLogsName[@]}
+
+for ((count_3=0; count_3 < ${lengthArray3}; count_3++)); do
+
+    h=$(($h+1))
+
+    if [[ mod_${serviceName[h-1]} != ${tempServiceName[h-1]} ]]
+    
+    then
+
+    tempServiceLogName=$(echo ${serviceLogName[h-1]}) 
+
+    tempArray=($(cat $tempServiceLogName))
+
+    echo ${tempArray[*]} > mod_$tempServiceLogName
+
+    mkdir mod-dir_${serviceLogName[h-1]}
+
+    mv mod_$tempServiceLogName mod-dir_${serviceLogName[h-1]}
+    
+    tempServiceDirName=($(ls | awk '/(log$)/' | cut -d '.' -f 1))
+
+    mv mod-dir_${serviceLogName[h-1]} mod_${tempServiceDirName[h-1]}
+
+    elif [[ mod_${serviceName[h-1]} = ${tempServiceName[h-1]} ]]
+    #Перезапись копии лог файла со свежими данными
+    then
+
+    tempServiceLogName=$(echo ${serviceLogName[h-1]})
+
+    tempArray=($(cat $tempServiceLogName))
+
+    echo ${tempArray[*]} > mod_${serviceName[h-1]}/mod_$tempServiceLogName
+
+    else
+
+    continue
+
+    fi
+
+done
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+#Скрипт, который анализирует логи Nginx и выводит на экран статистику: сколько и каких кодов ответов (HTTP 200, 301, 404 и т.д.) было на сегодняшний день.
+
+#!/bin/bash
+
+today_date=$(date)
+month=$(echo $today_date | awk '{print $2}')
+day=$(echo $today_date | awk '{print $3}')
+year=$(echo $today_date | awk '{print $6}')
+
+cat access.log | grep $day/$month/$year | awk '{print $9}' | grep -oE "\b([0-9]){1}[0-9]{2}\b" | sort | uniq -c | sort -rn
+

@@ -4,6 +4,7 @@ kubectl patch service nginx-ingress-controller-1636659940 \                 #
 -n nginx-ingress \                                                          # Команда для назначения внешнего ip (EXTERNAL-IP) адреса для ЛЮБОГО сервиса
 -p '{"spec": {"type": "LoadBalancer", "externalIPs":["192.168.250.130"]}}'  # -n (namespace) , -p (patch)
 kubectl delete all --all -n {namespace} (Удаляет все в ns без удаления ns)   (all относится ко всем типам ресурсов, таким как модули, развертывания, службы и т. Д. --all используется для удаления каждого объекта этого типа ресурса вместо указания его с использованием его имени или метки.)
+kubectl get pods/deployments/replicasets/quotas/all -n namespace --no-headers=true | awk '/pattern/{print $1}' | xargs  kubectl delete --force=true --wait=false --grace-period=0 -n namespace pod/deployment/replicaset/quota/all  (удалить все сущности определенного типа)
 kubectl label nodes/namespace имя ноды/пространства ключь=значение метки (создаем метки для узла чтобы можно было через нее указать что хотим разместить pod именно на узле с такой меткой)
 kubectl get nodes --show-labels (что бы посмотреть метки на нодах, но можно и через describe)
 kubectl describe pod/replicaset/deployment/node/... имя того, что хочешь посмотреть (после одного из четырех пишем имя, описание которого хотим посмотреть, покажет полное описание)

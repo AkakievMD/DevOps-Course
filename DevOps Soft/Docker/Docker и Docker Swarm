@@ -134,6 +134,8 @@ docker logout (разлогинить)
 docker exec -it "container id" bash или /bin/sh (попасть внутрь контейнера)
 docker exec -it "container id" env (посмотреть переменные контейнера)
 docker network create --driver overlay "NameNetwork"
+docker save -o <путь для генерации tar файла> <image name> (Пример: docker save -o c:/myfile.tar centos:16) (архивирования образа со всеми родительскими слоями, для следующего переноса на другой сервер)
+docker load -i <пут до image tar файла> (для рапаковки tar image файла)
 -------------------------------------------------------------------------------------------------
 
 							Docker Swarm
