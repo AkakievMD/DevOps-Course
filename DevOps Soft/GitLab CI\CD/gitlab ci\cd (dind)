@@ -58,3 +58,44 @@ deploy:
     - !reference [.deploy, script]
   rules:
     - if: '$CI_COMMIT_REF_NAME =~ /(^master$)/'
+
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+команда для скачивания файла с репы GitLab через curl:
+команда ниже для скаивания файла с корня репы, этот кусок ( https://git.b2pos.ru/api/v4/projects/19/repository/files/ ) не меняется, только доменное имя, слэшь указывается так ( %2F )
+curl -s --header "PRIVATE-TOKEN: gitlab_user_token" "https://git.b2pos.ru/api/v4/projects/19/repository/files/docker-compose.yml/raw?ref=master"
+
+Пример команды с файлом в папке:
+curl -s --header "PRIVATE-TOKEN: gitlab_user_token" "https://git.b2pos.ru/api/v4/projects/19/repository/files/docker%2Fdocker-compose.yml/raw?ref=master"
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Настройки GitLab runner для этого пайплайна:
+
+concurrent = 1
+check_interval = 0
+shutdown_timeout = 0
+
+[session_server]
+  session_timeout = 1800
+
+[[runners]]
+  name = "poscall-runner"
+  url = "Domain name"
+  id = 66
+  token = "GitLab token"
+  token_obtained_at = 2023-05-05T17:51:41Z
+  token_expires_at = 0001-01-01T00:00:00Z
+  executor = "docker"
+  [runners.cache]
+    MaxUploadedArchiveSize = 0
+  [runners.docker]
+    tls_verify = false
+    image = "ruby:2.7"
+    privileged = true
+#    security_opt = ["seccomp:unconfined", "apparmor:unconfined"]
+    disable_entrypoint_overwrite = false
+    oom_kill_disable = false
+    disable_cache = false
+    volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/certs/client", "/cache"]
+    shm_size = 0
