@@ -1,0 +1,6 @@
+Меры защиты SSH-сервера
+
+Нестандартный порт
+PermitRootLogin no
+PasswordAuthentication no
+Двухфакторная аутентификация

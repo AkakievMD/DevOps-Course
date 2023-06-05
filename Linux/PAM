@@ -1,0 +1,45 @@
+PAM
+Pluggable Authentication Modules
+Набор модулей для аутентификации пользователей
+Модули - /usr/lib/×86 64-linux-gnu/security
+Конфиги PAM - /etc/pam.d
+Конфиги модулей РАМ - /etc/security
+
+Конфиг PAM (CentOS 7)
+[root@localhost ~I# cat /etc/pam.d/sudo auth
+Тип модуля
+auth
+account
+password
+session
+session
+
+флаг контроля
+include
+include
+include
+optional
+include
+
+Модуль
+system-auth
+system-auth
+system-auth
+pam_keyinit.so
+system-auth
+
+Параметры
+revoke
+
+Типы модулей
+auth - аутентификация пользователя
+account - проверка возможности доступа к сервису
+password - обновление механизма аутентификации
+session - действия при входе пользователя в систему
+
+Флаги контроля
+required - указанный модуль должен успешно отработать остальные модули будут запущены при неудаче
+requisite - указанный модуль должен успешно отработать остальные модули не будут запущены при неудаче
+sufficient - если указанный модуль отработает успешно весь сервис будет считаться доступным optional - результат модуля не имеет значения если он не единственный
+optional - результат модуля не имеет значения если он не единственный
+include - подключить содержимое другого конфига РАМ

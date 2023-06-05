@@ -1,0 +1,74 @@
+syslog
+Стандарт отправки и регистрации сообщений
+Определяет категории и приоритеты сообщений
+Наиболее популярная реализация - rsyslog
+
+rsyslog
+Демон сбора и обработки логов
+Названия логов между дистрибутивами часто отличаются
+Конфигурация находится в /etc/syslog.conf
+
+Конфигурация rsyslog
+Правило обработки сообщения - источник и приоритет
+Назначение - куда сообщение будет отправлено
+
+Категории сообщений в syslog
+auth
+authpriv
+cron
+daemon
+kern
+Tor mail
+mark
+news
+security
+syslog
+user
+uucp
+localo…local7
+
+Приоритеты сообщений syslog
+emerg
+alert
+crit
+err
+warning
+notice
+info
+debug
+
+Ротация логов
+logrotate - утилита автоматической ротации логов
+Конфиг - /etc/logrotate.conf
+файл_лога { 
+параметр1
+параметр2
+параметр3
+}
+
+Параметры logrotate
+rotate
+create
+dateext
+compress
+delaycompress
+extension
+mail
+maxage
+missingok
+olddir
+postrotate/endscript
+start
+size
+
+Интервалы ротации
+hourly
+daily
+weekly
+monthly
+yearly
+
+Удаленное логирование
+rsyslog
+journald
+fluent-bit / filebeat / logstash
